@@ -11,6 +11,9 @@
         global.__dirname = process.execPath.substr(0,process.execPath.lastIndexOf('/'));
 
         var requirejs = require("requirejs");
+        var diagramDB = require("./db/diagrams");
+        var entitiesDB = require("./db/entities");
+
 
         requirejs.config({
 
@@ -34,13 +37,60 @@
             global._ = underscore;
             requirejs(["backbone"], function() {
                 requirejs(["marionette"], function() {
-                    requirejs(['bower_components/designer/demo/app'], function(app) {
-                        app.start()
+                    requirejs(['app/app'], function(app) {
+                        entitiesDB.listEntities(function(entities) {
+                            app.start(entities);
+                        });
                     });
                 });
             });
 
+            global.$(function() {
+
+                global.refreshDiagrams = function() {
+                    diagramDB.listDiagrams(function(diagrams) {
+                        var html = ["<select>"];
+
+                        for (var i = 0; i < diagrams.length; i++) {
+                            html.push("<option value='" + diagrams[i] + "'>" + diagrams[i] + "</option>");
+                        }
+
+                        html.push("</select>");
+
+                        global.$(".diagram-selector").html(html.join(""));
+
+                        if (global.selectedDiagram)
+                            global.$(".diagram-selector").val(global.selectedDiagram);
+
+                    })
+                };
+
+                global.$(".add-diagram").on("click", function() {
+
+                    var diagramName = prompt("New diagram", "");
+
+                    if (diagramName) {
+                        diagramDB.addDiagram(diagramName, function () {
+                            global.selectedDiagram = diagramName;
+                            global.refreshDiagrams();
+                        })
+                    }
+                });
+
+                global.refreshDiagrams();
+
+
+
+
+            })
+
+
+
         });
+
+    </script>
+
+    <script type="text/javascript">
 
     </script>
 
@@ -48,7 +98,16 @@
 
 </head>
 
+
+
 <body>
-<div class="js-graphContainer"></div>
+    <div class="diagram-selector">
+    </div>
+
+    <div class="add-diagram">
+        +
+    </div>
+
+    <div class="js-graphContainer"></div>
 </body>
 </html>
