@@ -37,9 +37,13 @@
             global._ = underscore;
             requirejs(["backbone"], function() {
                 requirejs(["marionette"], function() {
-                    requirejs(['app/app'], function(app) {
+                    requirejs(['app/app'], function(DiagramApplication) {
                         entitiesDB.listEntities(function(entities) {
-                            app.start(entities);
+                            global.application = new DiagramApplication();
+                            global.application.start(entities);
+
+                            if (global.pendingLoad)
+                                global.reloadSelectedDiagram();
                         });
                     });
                 });
@@ -49,7 +53,7 @@
 
                 global.refreshDiagrams = function() {
                     diagramDB.listDiagrams(function(diagrams) {
-                        var html = ["<select>"];
+                        var html = ["<select name='diagramSelector'>"];
 
                         for (var i = 0; i < diagrams.length; i++) {
                             html.push("<option value='" + diagrams[i] + "'>" + diagrams[i] + "</option>");
@@ -59,10 +63,45 @@
 
                         global.$(".diagram-selector").html(html.join(""));
 
+                        global.$(".diagram-selector > select").change(function() {
+                            global.changeSelectedDiagram (global.$(this).val());
+                        });
+
                         if (global.selectedDiagram)
-                            global.$(".diagram-selector").val(global.selectedDiagram);
+                            global.$(".diagram-selector > select").val(global.selectedDiagram);
+                        else if (diagrams.length > 0) {
+                            global.changeSelectedDiagram(diagrams[0]);
+                        }
 
                     })
+                };
+
+                global.changeSelectedDiagram = function(diagram) {
+                    global.selectedDiagram  = diagram;
+                    global.pendingLoad = true;
+
+                    if (!global.application)
+                        return;
+
+                    global.reloadSelectedDiagram();
+                };
+
+                global.reloadSelectedDiagram = function() {
+                    global.pendingLoad = false;
+
+                    diagramDB.loadDiagram(global.selectedDiagram, function(json) {
+//                        global.application.diagram.collection = new global.Backbone.Collection(JSON.parse(json));
+//                        global.application.diagram.updateFromCollection();
+
+                        global.application.diagram.setCollection(JSON.parse(json));
+//
+                    });
+
+                };
+
+                global.saveDiagram = function() {
+                    var json = JSON.stringify(global.application.diagram.collection.models);
+                    diagramDB.overwriteDiagram(global.selectedDiagram, json);
                 };
 
                 global.$(".add-diagram").on("click", function() {
@@ -77,11 +116,9 @@
                     }
                 });
 
+                global.$(".save-diagram").on("click", global.saveDiagram);
+
                 global.refreshDiagrams();
-
-
-
-
             })
 
 
@@ -101,12 +138,11 @@
 
 
 <body>
-    <div class="diagram-selector">
-    </div>
+    <span class="diagram-selector little-menu no-select"></span>
 
-    <div class="add-diagram">
-        +
-    </div>
+    <span class="add-diagram little-menu o-select">+</span>
+
+    <span class="save-diagram little-menu o-select">save</span>
 
     <div class="js-graphContainer"></div>
 </body>

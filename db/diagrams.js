@@ -17,7 +17,7 @@ exports.listDiagrams = function(callback) {
         callback(diagramNames);
 
     })
-}
+};
 
 exports.addDiagram = function(name, callback) {
 
@@ -25,10 +25,24 @@ exports.addDiagram = function(name, callback) {
 
     exports.overwriteDiagram(name, json, callback);
 
+};
+
+function getFileName(diagramName) {
+    return __dirname + "/" + diagramName + ".n3d";
 }
 
 exports.overwriteDiagram = function (name, json, callback) {
 
-    fs.writeFile(__dirname + "/" + name + ".n3d", json);
+    fs.writeFile(getFileName(name), json);
 
-}
+    callback && callback();
+
+};
+
+exports.loadDiagram = function(name, callback) {
+
+    fs.readFile(getFileName(name), "utf-8", function(err, data) {
+        callback(data);
+    });
+
+};

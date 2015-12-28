@@ -94,13 +94,35 @@ circle.dev-diagram-connector.js-diagram-connector-visible.js-diagram-connector-h
     fill: #fff;
     stroke: blue;
     stroke-width: 1px;
+    opacity: 0.4;
 }
 
-.diagram-activity-entity-text, .toolbox-activity-entity-text {
+.diagram-activity-entity-text, .toolbox-activity-entity-text, .diagram-activity-attribute-text {
     stroke: black;
-    stroke-width: 1px;
+    fill: black;
+    stroke-width: 0.5;
+    font-family: "Courier New", Courier, monospace;
+    cursor: pointer;
 }
 
 .toolbox-activity-entity-text {
-    font-size: smaller
+    font-size: small;
+}
+
+.diagram-activity-attribute-text {
+    stroke: darkblue;
+    fill: darkblue;
+    font-size: smaller;
+}
+
+.little-menu {
+    margin: 5px;
+    padding: 5px;
+    cursor: default;
+    font-weight: bold;
+}
+
+.little-menu:hover {
+    background-color: #efefef;
+    border: 1px solid grey;
 }

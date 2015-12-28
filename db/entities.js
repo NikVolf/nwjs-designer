@@ -41,7 +41,7 @@ var entities = [
 ]
 
 exports.listEntities = function(callback) {
-    var selectedEntities = _.omit(entities, "attributes");
+    var selectedEntities = _.uniq(entities);
     callback(selectedEntities);
 };
 

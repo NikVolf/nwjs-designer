@@ -20,8 +20,8 @@ define([
                 initialize: function() {
                     ToolboxElement.prototype.initialize.apply(this, arguments);
                     this.tpl = Handlebars.compile(
-                        '<rect class="js-toolbox toolbox-activity-entity" x=5 y=0 width=80 height=24 />' +
-                        '<text class="toolbox-activity-entity-text" x="8" y="17" width="60" height="24">{{name}}</text>',
+                        '<rect class="js-toolbox toolbox-activity-entity" x=5 y=0 width=120 height=24 />' +
+                        '<text class="toolbox-activity-entity-text" x="8" y="17" width="100" height="24">{{name}}</text>',
                         entity
                         );
                 }
@@ -33,18 +33,76 @@ define([
                 return Activity.extend({
                     initialize: function(cfg) {
 
-                        cfg.model.attributes.entity = entity;
+                        cfg.model.attributes.entity = this.entity = entity;
+                        cfg.model.attributes.size = cfg.model.attributes.size || {};
                         cfg.model.attributes.size.width = 200;
+                        cfg.model.attributes.size.height = entity.attributes.length * 30 + 50;
 
                         behaviors.rectangularResizers.setup(this);
                         behaviors.rectangularShapedConnectorSet.setup(this);
                         _.extend(cfg, {
                             template: '<g transform="{{dimScale}}"  class="js-activity-resize-root">' +
                                 '<rect class="diagram-activity-entity" vector-effect="non-scaling-stroke" x="0" y="0" width="100" height="100"></rect>' +
-                                '<g class="js-activity-resize-root-anti" transform="{{dimScaleA}}" ><text class="diagram-activity-entity-text no-select" x="10" y="20" width="80" height="80" >{{entity.name}}</text></g>' +
+                                '<g class="js-activity-resize-root-anti js-attribute-list" transform="{{dimScaleA}}" >' +
+                                    '<text class="diagram-activity-entity-text no-select" x="10" y="20" width="80" height="25" >{{entity.name}}</text>' +
+                                '</g>' +
                                 '</g>'
                         });
                         Activity.prototype.initialize.apply(this, [cfg]);
+                    },
+
+                    appendViewItems: function() {
+                        Activity.prototype.appendViewItems.apply(this, arguments);
+
+                        _.each(this.entity.attributes, function(attribute, index) {
+                            this.activityG.select(".js-attribute-list")
+                                .append("text")
+                                .classed({
+                                    'diagram-activity-attribute-text': true,
+                                    'no-select': true
+                                })
+                                .attr({
+                                    x: 20,
+                                    y: 50 + index*25,
+                                    width: 80,
+                                    height: 20
+                                })
+                                .text(attribute.id + " : " + attribute.type)
+                        }.bind(this));
+                    },
+
+                    fillFlows: function(norecursive) {
+                        _.each(entity.attributes, function(attribute) {
+
+
+                            var connected = _.filter(this.parent.viewModels, function(f) {
+                                if (f == this || !f.entity)
+                                    return false;
+
+                                return f.entity.id == attribute.type;
+                            }.bind(this));
+
+                            _.each(connected, function(connectedViewModel) {
+                                this.parent.connectNewActivities(this, connectedViewModel).id;
+                            }.bind(this));
+
+                        }.bind(this));
+
+                        _.each(this.parent.viewModels, function(f) {
+                            if (!f.entity)
+                                return;
+
+                            if (_.findWhere(f.entity.attributes, {type: this.entity.id})) {
+                                this.parent.connectNewActivities(f, this);
+                            }
+                        }.bind(this));
+
+
+                    },
+
+                    onPlaced: function() {
+                        this.fillFlows();
+                        Activity.prototype.onPlaced.apply(this, arguments);
                     }
                 });
             }
@@ -63,6 +121,7 @@ define([
                 ToolboxGroup.prototype.initialize.apply(this, arguments);
 
                 this.entities = options.entities;
+                this.position = { x: 0, y: 10};
 
                 _.each(this.entities, function(entity, index) {
                     var toolboxElement = new EntityToolboxElement(entity, index);

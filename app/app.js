@@ -4,25 +4,15 @@
 
 define(['bower_components/designer/js/diagram/diagram', 'app/entitiesPalette'], function(Diagram, EntitiesPalette) {
 
-    var demoApp = {
-
-        setupContainer: function() {
-            this.container = document.createElement("div");
-            this.container.setAttribute("class", ".js-graph-container");
-            document.body.appendChild(this.container);
-
-            this.htmlSelect = $(this.container);
-        },
-
-
+    return Marionette.Object.extend({
         showDiagram: function(entites) {
-            var diagram = new Diagram();
-            diagram.render();
+            this.diagram = new Diagram({ toolboxWidth: 140, size: { width: "1600px", height: "900px" } });
+            this.diagram.render();
 
             var entitiesPalette = new EntitiesPalette({ entities: entites });
-            entitiesPalette.install(diagram);
+            entitiesPalette.install(this.diagram);
 
-            $(window).on("resize", diagram.resize.bind(diagram));
+            $(window).on("resize", this.diagram.resize.bind(this.diagram));
         },
 
         start: function(entities) {
@@ -31,9 +21,6 @@ define(['bower_components/designer/js/diagram/diagram', 'app/entitiesPalette'], 
             }.bind(this));
 
         }
-    };
-
-    return demoApp;
-
+    });
 
 });
