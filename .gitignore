@@ -2,7 +2,6 @@ bower_components
 .git
 node_modules
 .idea
-demo
 js
 locales
 test

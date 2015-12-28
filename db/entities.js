@@ -23,7 +23,7 @@ var entities = [
                 id: "properties",
                 type: "objectProperty",
                 isMultiValue: "true"
-            },
+            }
         ]
     },
     {

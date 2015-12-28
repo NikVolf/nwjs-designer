@@ -19,7 +19,11 @@ define([
             this.view = ToolboxElement.extend({
                 initialize: function() {
                     ToolboxElement.prototype.initialize.apply(this, arguments);
-                    this.tpl = Handlebars.compile("<rect class='js-toolbox toolbox-rectangle-primitive' x=0 y=0 width=90 height=15 />")
+                    this.tpl = Handlebars.compile(
+                        '<rect class="js-toolbox toolbox-activity-entity" x=5 y=0 width=80 height=24 />' +
+                        '<text class="toolbox-activity-entity-text" x="8" y="17" width="60" height="24">{{name}}</text>',
+                        entity
+                        );
                 }
             });
             this.type = entity.id;
@@ -28,13 +32,16 @@ define([
             this.Activity = function() {
                 return Activity.extend({
                     initialize: function(cfg) {
+
                         cfg.model.attributes.entity = entity;
+                        cfg.model.attributes.size.width = 200;
+
                         behaviors.rectangularResizers.setup(this);
                         behaviors.rectangularShapedConnectorSet.setup(this);
                         _.extend(cfg, {
                             template: '<g transform="{{dimScale}}"  class="js-activity-resize-root">' +
                                 '<rect class="diagram-activity-entity" vector-effect="non-scaling-stroke" x="0" y="0" width="100" height="100"></rect>' +
-                                '<text class="diagram-activity-entity-text" x="20" y="20">{{entity.name}}</text>' +
+                                '<g class="js-activity-resize-root-anti" transform="{{dimScaleA}}" ><text class="diagram-activity-entity-text no-select" x="10" y="20" width="80" height="80" >{{entity.name}}</text></g>' +
                                 '</g>'
                         });
                         Activity.prototype.initialize.apply(this, [cfg]);
@@ -64,8 +71,8 @@ define([
 
                 }.bind(this));
 
-                this.id = "primitivesGroup";
-                this.title = "Primitives"
+                this.id = "entitiesGroup";
+                this.title = "Entities"
             }
         });
 
