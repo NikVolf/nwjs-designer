@@ -126,3 +126,7 @@ circle.dev-diagram-connector.js-diagram-connector-visible.js-diagram-connector-h
     background-color: #efefef;
     border: 1px solid grey;
 }
+
+.g-selected .diagram-activity-entity {
+    stroke-width: 2;
+}

@@ -2,11 +2,11 @@
  * Created by nvolf on 22.12.2015.
  */
 
-define(['bower_components/designer/js/diagram/diagram', 'app/entitiesPalette'], function(Diagram, EntitiesPalette) {
+define(['bower_components/designer/js/diagram/diagram', 'app/entitiesPalette', './keypress'], function(Diagram, EntitiesPalette, keypress) {
 
     return Marionette.Object.extend({
         showDiagram: function(entites) {
-            this.diagram = new Diagram({ toolboxWidth: 140, size: { width: "1600px", height: "900px" } });
+            this.diagram = new Diagram({ toolboxWidth: 320, toolboxHeight: 2000, size: { width: "1900px", height: "900px" } });
             this.diagram.render();
 
             var entitiesPalette = new EntitiesPalette({ entities: entites });
@@ -18,6 +18,20 @@ define(['bower_components/designer/js/diagram/diagram', 'app/entitiesPalette'], 
         start: function(entities) {
             $(function() {
                 this.showDiagram(entities);
+
+                this.setupKeyListener();
+
+            }.bind(this));
+
+        },
+
+        setupKeyListener: function() {
+            var self = this;
+
+            $(window.document).keydown(function(event) {
+                if (event.keyCode == 46 ) {
+                    this.diagram.deleteSelected();
+                }
             }.bind(this));
 
         }

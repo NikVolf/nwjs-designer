@@ -20,8 +20,8 @@ define([
                 initialize: function() {
                     ToolboxElement.prototype.initialize.apply(this, arguments);
                     this.tpl = Handlebars.compile(
-                        '<rect class="js-toolbox toolbox-activity-entity" x=5 y=0 width=120 height=24 />' +
-                        '<text class="toolbox-activity-entity-text" x="8" y="17" width="100" height="24">{{name}}</text>',
+                        '<rect class="js-toolbox toolbox-activity-entity" x=5 y=0 width=300 height=24 />' +
+                        '<text class="toolbox-activity-entity-text" x="8" y="17" width="290" height="24">{{name}}</text>',
                         entity
                         );
                 }
@@ -33,18 +33,21 @@ define([
                 return Activity.extend({
                     initialize: function(cfg) {
 
-                        cfg.model.attributes.entity = this.entity = entity;
+                        this.entity = entity;
                         cfg.model.attributes.size = cfg.model.attributes.size || {};
-                        cfg.model.attributes.size.width = 200;
-                        cfg.model.attributes.size.height = entity.attributes.length * 30 + 50;
+                        if (!cfg.model.attributes.size.width  || cfg.model.attributes.size.width == 100)
+                            cfg.model.attributes.size.width = 200;
+
+                        if (!cfg.model.attributes.size.height || cfg.model.attributes.size.height == 80)
+                            cfg.model.attributes.size.height = entity.attributes.length * 30 + 50;
 
                         behaviors.rectangularResizers.setup(this);
                         behaviors.rectangularShapedConnectorSet.setup(this);
                         _.extend(cfg, {
                             template: '<g transform="{{dimScale}}"  class="js-activity-resize-root">' +
-                                '<rect class="diagram-activity-entity" vector-effect="non-scaling-stroke" x="0" y="0" width="100" height="100"></rect>' +
+                                '<rect class="diagram-activity-entity js-activity-shape" vector-effect="non-scaling-stroke" x="0" y="0" width="100" height="100"></rect>' +
                                 '<g class="js-activity-resize-root-anti js-attribute-list" transform="{{dimScaleA}}" >' +
-                                    '<text class="diagram-activity-entity-text no-select" x="10" y="20" width="80" height="25" >{{entity.name}}</text>' +
+                                    '<text class="diagram-activity-entity-text no-select" x="10" y="20" width="80" height="25" >' + this.entity.name + '</text>' +
                                 '</g>' +
                                 '</g>'
                         });
@@ -67,8 +70,11 @@ define([
                                     width: 80,
                                     height: 20
                                 })
-                                .text(attribute.id + " : " + attribute.type)
+                                .text(attribute.name + " : " + attribute.typeName)
                         }.bind(this));
+
+                        this.setupComponentScale(this.activityG);
+                        this.setupComponentScale(this.resizersG);
                     },
 
                     fillFlows: function(norecursive) {
@@ -83,7 +89,8 @@ define([
                             }.bind(this));
 
                             _.each(connected, function(connectedViewModel) {
-                                this.parent.connectNewActivities(this, connectedViewModel).id;
+                                if (this != connectedViewModel)
+                                    this.parent.connectNewActivities(this, connectedViewModel).id;
                             }.bind(this));
 
                         }.bind(this));
@@ -93,7 +100,8 @@ define([
                                 return;
 
                             if (_.findWhere(f.entity.attributes, {type: this.entity.id})) {
-                                this.parent.connectNewActivities(f, this);
+                                if (this != f)
+                                    this.parent.connectNewActivities(f, this);
                             }
                         }.bind(this));
 

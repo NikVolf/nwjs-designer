@@ -110,8 +110,9 @@
 
                     if (diagramName) {
                         diagramDB.addDiagram(diagramName, function () {
-                            global.selectedDiagram = diagramName;
                             global.refreshDiagrams();
+                            global.changeSelectedDiagram(diagramName);
+
                         })
                     }
                 });
@@ -140,9 +141,9 @@
 <body>
     <span class="diagram-selector little-menu no-select"></span>
 
-    <span class="add-diagram little-menu o-select">+</span>
+    <span class="add-diagram little-menu no-select">+</span>
 
-    <span class="save-diagram little-menu o-select">save</span>
+    <span class="save-diagram little-menu no-select">save</span>
 
     <div class="js-graphContainer"></div>
 </body>
