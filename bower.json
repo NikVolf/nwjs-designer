@@ -23,6 +23,7 @@
   ],
   "dependencies": {
     "handlebars": "~4.0.5",
-    "designer": "https://github.com/NikVolf/de-refactoring.git"
+    "diagram-designer-core": "~0.2.0",
+    "requirejs": "~2.1.22"
   }
 }

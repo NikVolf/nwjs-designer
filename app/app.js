@@ -2,7 +2,7 @@
  * Created by nvolf on 22.12.2015.
  */
 
-define(['bower_components/designer/js/diagram/diagram', 'app/entitiesPalette', './keypress'], function(Diagram, EntitiesPalette, keypress) {
+define(['bower_components/diagram-designer-core/js/diagram/diagram', 'app/entitiesPalette', './keypress'], function(Diagram, EntitiesPalette, keypress) {
 
     return Marionette.Object.extend({
         showDiagram: function(entites) {

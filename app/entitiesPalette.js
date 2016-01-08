@@ -5,11 +5,11 @@
  * Created by nvolf on 17.12.2015.
  */
 define([
-        'bower_components/designer/js/diagram/toolboxGroup',
-        'bower_components/designer/js/diagram/toolboxElement',
-        'bower_components/designer/js/activity/activity',
-        'bower_components/designer/js/activity/flow',
-        'bower_components/designer/js/behaviors/api'
+        'bower_components/diagram-designer-core/js/diagram/toolboxGroup',
+        'bower_components/diagram-designer-core/js/diagram/toolboxElement',
+        'bower_components/diagram-designer-core/js/activity/activity',
+        'bower_components/diagram-designer-core/js/activity/flow',
+        'bower_components/diagram-designer-core/js/behaviors/api'
     ],
 
     function(ToolboxGroup, ToolboxElement, Activity, FlowView, behaviors) {
